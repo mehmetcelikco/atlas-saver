@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Atlas Saver</title>
+<style>
+  :root { color-scheme: light dark; --bg:#fff; --fg:#111; --mute:#8a8a8a; --line:#e8e8e8; --field:#f6f6f6; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#161616; --fg:#f2f2f2; --mute:#8a8a8a; --line:#2a2a2a; --field:#202020; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; width: 320px; padding: 18px; background: var(--bg); color: var(--fg);
+         font: 13px/1.4 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif; }
+  header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  header img { width: 24px; height: 24px; border-radius: 6px; }
+  h1 { font-size: 14px; font-weight: 600; margin: 0; letter-spacing: -.01em; }
+  .dot { margin-left: auto; display: flex; align-items: center; gap: 6px; color: var(--mute); font-size: 12px; }
+  .dot i { width: 7px; height: 7px; border-radius: 50%; background: #c4c4c4; }
+  .dot.ok i { background: #2fb36a; } .dot.bad i { background: #d63434; }
+  label { display: block; margin: 12px 0 5px; font-size: 12px; color: var(--mute); }
+  input, select { width: 100%; height: 32px; padding: 0 10px; border: 1px solid transparent; border-radius: 8px;
+          background: var(--field); color: var(--fg); font: inherit; outline: none; }
+  select { appearance: none; cursor: pointer; }
+  input:focus-visible, select:focus-visible { border-color: var(--fg); }
+  input.mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; }
+  .row { display: flex; gap: 8px; margin-top: 16px; }
+  button { flex: 1; height: 32px; border-radius: 8px; border: 1px solid var(--line); background: transparent;
+           color: var(--fg); font: inherit; font-weight: 500; cursor: pointer; }
+  button.primary { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+  button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+  .shots { display: flex; gap: 8px; }
+  button.shot { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 4px; }
+  button.shot kbd { font: 500 11px/1 ui-monospace, "SF Mono", Menlo, monospace; opacity: .6; }
+  .keys { display: grid; gap: 6px; padding: 10px; border-radius: 8px; background: var(--field); font-size: 12px; }
+  .keys div { display: flex; justify-content: space-between; align-items: center; }
+  .keys kbd { font: 500 11px/1 ui-monospace, "SF Mono", Menlo, monospace; color: var(--mute); }
+  button.link { flex: none; height: auto; padding: 0; border: 0; justify-self: start; color: var(--fg);
+                font-size: 12px; text-decoration: underline; text-underline-offset: 2px; }
+  p.err { color: #d63434; min-height: 0; margin: 6px 0 0; }
+  p { margin: 14px 0 0; color: var(--mute); font-size: 12px; }
+</style>
+</head>
+<body>
+  <header>
+    <img src="icons/48.png" alt="">
+    <h1>Atlas Saver</h1>
+    <span class="dot" id="status" role="status"><i></i><span>Checking</span></span>
+  </header>
+
+  <div class="shots">
+    <button id="shot" type="button" class="primary shot">Screenshot <kbd id="keys">⌥⇧S</kbd></button>
+    <button id="full" type="button" class="shot">Full page <kbd id="fullKeys">⌥⇧F</kbd></button>
+  </div>
+
+  <p class="err" id="shotErr" role="alert" hidden></p>
+
+  <label for="shotScale">Screenshot quality</label>
+  <select id="shotScale">
+    <option value="2">Retina 2×</option>
+    <option value="4">Retina 4×</option>
+  </select>
+
+  <label>Shortcuts</label>
+  <div class="keys">
+    <div><span>Screenshot</span><kbd id="keysRow">⌥⇧S</kbd></div>
+    <div><span>Full page</span><kbd id="fullKeysRow">⌥⇧F</kbd></div>
+    <button id="editKeys" type="button" class="link">Change in Chrome</button>
+  </div>
+
+  <label for="hoverKey">Show the + button while holding</label>
+  <select id="hoverKey">
+    <option value="Alt">⌥ Option</option>
+    <option value="Control">⌃ Control</option>
+    <option value="Shift">⇧ Shift</option>
+    <option value="none">Nothing, always show it</option>
+  </select>
+
+  <label for="noteKey">Add a note and tags: also hold</label>
+  <select id="noteKey">
+    <option value="Meta">⌘ Command</option>
+    <option value="Alt">⌥ Option</option>
+    <option value="Control">⌃ Control</option>
+    <option value="Shift">⇧ Shift</option>
+  </select>
+
+  <label for="collection">Save to collection</label>
+  <input id="collection" placeholder="Inbox" autocomplete="off" spellcheck="false">
+
+  <label for="endpoint">Endpoint</label>
+  <input id="endpoint" class="mono" placeholder="Atlas ▸ Settings ▸ Developers" autocomplete="off" spellcheck="false">
+
+  <label for="token">Access key</label>
+  <input id="token" class="mono" type="password" placeholder="Access key from the same screen" autocomplete="off" spellcheck="false">
+
+  <div class="row">
+    <button id="test" type="button">Test connection</button>
+    <button id="save" type="button" class="primary">Save</button>
+  </div>
+  <p id="help"></p>
+
+  <script src="defaults.js"></script>
+  <script src="config.js" onerror="this.remove()"></script>
+  <script src="options.js"></script>
+</body>
+</html>

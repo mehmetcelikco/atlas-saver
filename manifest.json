@@ -1,0 +1,90 @@
+{
+  "manifest_version": 3,
+  "name": "Atlas Saver",
+  "version": "1.11.0",
+  "description": "Save any image or video on the web to Atlas with its source link, or snap a screenshot of any block on the page.",
+  "permissions": [
+    "storage",
+    "declarativeNetRequestWithHostAccess",
+    "scripting",
+    "downloads",
+    "downloads.ui",
+    "nativeMessaging",
+    "debugger",
+    "offscreen"
+  ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "atlas",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  },
+  "host_permissions": [
+    "<all_urls>",
+    "http://127.0.0.1/*",
+    "http://localhost/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.instagram.com/*"
+      ],
+      "js": [
+        "ig-hook.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "content.js",
+        "shot.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "Atlas Saver",
+    "default_popup": "options.html",
+    "default_icon": {
+      "16": "icons/16.png",
+      "32": "icons/32.png"
+    }
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
+  },
+  "icons": {
+    "16": "icons/16.png",
+    "32": "icons/32.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+  "commands": {
+    "take-screenshot": {
+      "suggested_key": {
+        "default": "Alt+Shift+S",
+        "mac": "Alt+Shift+S"
+      },
+      "description": "Take a screenshot to Atlas"
+    },
+    "take-full-page": {
+      "suggested_key": {
+        "default": "Alt+Shift+F",
+        "mac": "Alt+Shift+F"
+      },
+      "description": "Take a full-page screenshot to Atlas"
+    }
+  }
+}
