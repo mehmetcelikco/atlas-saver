@@ -3,6 +3,5 @@
 // For a local override without the popup, copy config.example.js to config.js (it's git-ignored).
 var ATLAS_DEFAULTS = {
   endpoint: "",
-  token: "",
-  collection: "" // empty = Atlas Inbox
+  token: ""
 };

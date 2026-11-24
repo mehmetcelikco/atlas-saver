@@ -2,116 +2,238 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Atlas Saver</title>
+<title>Atlas Saver Settings</title>
 <style>
-  :root { color-scheme: light dark; --bg:#fff; --fg:#111; --mute:#8a8a8a; --line:#e8e8e8; --field:#f6f6f6; }
-  @media (prefers-color-scheme: dark) { :root { --bg:#161616; --fg:#f2f2f2; --mute:#8a8a8a; --line:#2a2a2a; --field:#202020; } }
+  @font-face {
+    font-family: "Inter Variable";
+    src: url("fonts/InterVariable.woff2") format("woff2-variations"), url("fonts/InterVariable.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+  /* contrast measured: --mute 5.33:1 on --bg and 4.85:1 on --field; --accent 4.76:1; --danger 4.77:1.
+     Control strokes are a light gray at rest, darker on hover, --fg while focused. */
+  :root { color-scheme: light dark; --bg:#fff; --fg:#111; --mute:#6b6b6b; --line:#e8e8e8; --field:#f4f4f4; --tip:#1c1c1c; --tip-fg:#f2f2f2;
+          --control-border:#e2e2e2; --control-border-hover:#bdbdbd; --accent:#1f6fe0; --danger:#d63434;
+          --keycap-edge: rgba(17,17,17,.1); }
+  @media (prefers-color-scheme: dark) { :root { --bg:#161616; --fg:#f2f2f2; --mute:#8a8a8a; --line:#2a2a2a; --field:#212121; --tip:#f2f2f2; --tip-fg:#111;
+          --control-border:#2e2e2e; --control-border-hover:#4a4a4a; --accent:#3d8bff; --danger:#ff6b6b;
+          --keycap-edge: rgba(255,255,255,.16); } }
   * { box-sizing: border-box; }
-  body { margin: 0; padding: 4px 2px 12px; background: var(--bg); color: var(--fg);
-         font: 13px/1.4 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif; }
-  body.popup { width: 320px; padding: 18px; }
-  .popup-only { display: none; }
-  body.popup .popup-only { display: block; }
-  body.popup header.popup-only, body.popup .shots.popup-only { display: flex; }
+  body { margin: 0 auto; max-width: 560px; padding: 56px 24px 64px; background: var(--bg); color: var(--fg);
+         font: 0.8125rem/1.4 "Inter Variable", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         font-feature-settings: "cv11"; -webkit-font-smoothing: antialiased; }
+  body.popup { width: 300px; max-width: none; margin: 0; padding: 12px 12px 10px; }
+  /* compact popup: tighter rhythm, same parts */
+  body.popup header { padding: 0 12px; }
+  body.popup section { margin-top: 16px; }
+  body.popup h2 { margin-bottom: 6px; font-size: 0.75rem; color: var(--mute); }
+  body.popup .row { min-height: 36px; padding: 4px 4px 4px 12px; }
+  body.popup .rows { border-radius: 11px; }                       /* 7 + 4 */
+  body.popup .row select, body.popup .keyfield { width: 112px; height: 28px; }
+  body.popup .switch { margin-right: 2px; }
+  /* popup footer: connection status on the left, settings gear in the bottom-right corner */
+  .popup-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding: 0 4px 0 12px; }
+  .popup-foot .dot { margin-left: 0; }
+  .gear { all: unset; box-sizing: border-box; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px;
+          color: var(--mute); cursor: pointer; transition: background-color 150ms ease-out, color 150ms ease-out, scale 150ms ease-out; }
+  .gear .sf { font-size: 15px; } .gear .sf-svg { width: 15px; height: 15px; }
+  @media (hover: hover) { .gear:hover { background: var(--field); color: var(--fg); } }
+  .gear:active { scale: .96; }
+  .gear:focus-visible { outline: 2px solid var(--fg); outline-offset: 1px; color: var(--fg); }
 
-  header { align-items: center; gap: 10px; margin-bottom: 16px; }
-  header img { width: 24px; height: 24px; }
-  h1 { font-size: 14px; font-weight: 600; margin: 0; letter-spacing: -.01em; }
-  h2 { display: flex; align-items: center; margin: 22px 0 2px; font-size: 13px; font-weight: 600; letter-spacing: -.005em; }
-  section:first-of-type h2 { margin-top: 4px; }
-  body.popup section:first-of-type h2 { margin-top: 18px; }
-  .dot { margin-left: auto; display: flex; align-items: center; gap: 6px; color: var(--mute); font-size: 12px; font-weight: 400; }
+  header { margin-bottom: 36px; padding: 0 12px; }
+  h1 { font-size: 1.375rem; font-weight: 650; margin: 0; letter-spacing: -.02em; }
+  body.popup header { margin-bottom: 14px; }
+  body.popup h1 { font-size: 0.875rem; font-weight: 600; letter-spacing: -.01em; }
+
+  section { margin-top: 36px; }
+  section:first-of-type { margin-top: 0; }
+  body.popup section { margin-top: 22px; }
+  body.popup section:first-of-type { margin-top: 0; }
+  /* headings, labels and row text share one 12px edge */
+  h2 { position: relative; display: flex; align-items: center; gap: 6px; margin: 0 0 10px; padding: 0 12px; font-size: 0.8125rem; font-weight: 600; letter-spacing: -.005em; }
+
+  /* info icon with its tooltip; the tooltip spans the heading's width */
+  .info { all: unset; display: grid; place-items: center; width: 14px; height: 14px; border-radius: 50%; color: var(--mute); cursor: help; }
+  .info .sf { font-size: 11px; } .info .sf-svg { width: 12px; height: 12px; }
+  .info:focus-visible { color: var(--fg); }
+  @media (hover: hover) { .info:hover { color: var(--fg); } }
+  .info:focus-visible { outline: 2px solid var(--fg); outline-offset: 1px; }
+  .tooltip { position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 5; padding: 8px 10px; border-radius: 8px;
+             background: var(--tip); color: var(--tip-fg); font-size: 0.75rem; font-weight: 400; line-height: 1.45; letter-spacing: 0;
+             box-shadow: 0 8px 24px rgba(0,0,0,.18); opacity: 0; visibility: hidden;
+             transition: opacity 150ms cubic-bezier(.23, 1, .32, 1), visibility 0s 150ms; }
+  /* bridge the 6px gap so the pointer can move from the icon onto the tooltip */
+  .tooltip::before { content: ""; position: absolute; left: 0; right: 0; top: -6px; height: 6px; }
+  .info:focus-visible + .tooltip { opacity: 1; visibility: visible; transition-delay: 0s; }
+  @media (hover: hover) {
+    .info:hover + .tooltip, .tooltip:hover { opacity: 1; visibility: visible; transition-delay: 0s; }
+  }
+  /* Esc hides it until the pointer or focus moves on */
+  h2.tip-dismissed .tooltip { opacity: 0 !important; visibility: hidden !important; }
+
+  .dot { margin-left: auto; display: flex; align-items: center; gap: 6px; color: var(--mute); font-size: 0.75rem; font-weight: 400; }
   .dot i { width: 7px; height: 7px; border-radius: 50%; background: #c4c4c4; }
-  .dot.ok i { background: #2fb36a; } .dot.bad i { background: #d63434; }
+  .dot.ok i { background: #2fb36a; } .dot.bad i { background: var(--danger); }
 
-  label { display: block; margin: 12px 0 5px; font-size: 12px; color: var(--mute); }
-  input, select { width: 100%; height: 32px; padding: 0 10px; border: 1px solid transparent; border-radius: 8px;
+  label.stack { display: block; margin: 12px 0 5px; padding: 0 12px; font-size: 0.75rem; color: var(--mute); }
+  section h2 + label.stack { margin-top: 0; }
+  /* fields and buttons share the list rows' height (42) and corner (13) */
+  input, select { width: 100%; height: 42px; padding: 0 12px; border: 1px solid var(--control-border); border-radius: 13px;
           background: var(--field); color: var(--fg); font: inherit; outline: none; }
   select { appearance: none; cursor: pointer; }
-  input:focus-visible, select:focus-visible { border-color: var(--fg); }
-  input.mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; }
+  input:focus, select:focus-visible { border-color: var(--fg); }
+  /* strokes: light at rest, a step darker under the pointer */
+  input, select, .keyfield, .actions button { transition-property: border-color, scale, background-color, opacity; transition-duration: 150ms; transition-timing-function: ease-out; }
+  @media (hover: hover) {
+    input:not(:focus):hover, .row select:hover, .keyfield:not(.recording):hover, .actions button:not(.primary):hover { border-color: var(--control-border-hover); }
+  }
+  input.mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.75rem; }
 
-  .row { display: flex; gap: 8px; margin-top: 14px; }
-  button { flex: 1; height: 32px; border-radius: 8px; border: 1px solid var(--line); background: transparent;
+  .actions { display: flex; gap: 8px; margin-top: 14px; }
+  .actions button { flex: 1; height: 42px; border-radius: 13px; border: 1px solid var(--control-border); background: transparent;
            color: var(--fg); font: inherit; font-weight: 500; cursor: pointer; }
-  button.primary { background: var(--fg); color: var(--bg); border-color: var(--fg); }
-  button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+  .actions button.primary { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+  .actions button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
 
-  .shots { gap: 8px; }
-  button.shot { display: flex; align-items: center; justify-content: center; gap: 8px; }
-  button.shot kbd { font: 500 11px/1 ui-monospace, "SF Mono", Menlo, monospace; opacity: .6; }
-  p.err { color: #d63434; margin: 8px 0 0; font-size: 12px; }
+  /* name on the left, control on the right */
+  /* controls sit 6px from the edge, so the outer radius is 7 + 6 */
+  .rows { border-radius: 13px; background: var(--field); }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 42px; padding: 6px 6px 6px 12px; }
+  .row + .row { border-top: 1px solid var(--line); }
+  .row > span, .row > label { white-space: nowrap; }
+  /* every control in the right column: same box, content aligned right */
+  .row select, .keyfield { width: 132px; height: 30px; flex: none; border-radius: 7px; background: var(--bg); }
+  .row select { padding: 0 12px 0 28px; border: 1px solid var(--control-border); text-align: right; text-align-last: right; font: 500 0.8125rem/1 "Inter Variable", -apple-system, sans-serif; }
+  .select { position: relative; flex: none; }
+  .select .chev { position: absolute; left: 10px; top: 50%; translate: 0 -50%; display: inline-flex; color: var(--mute); pointer-events: none; font-size: 0.6875rem; }
+  .select .chev .sf { font-size: 0.6875rem; }
+  .select .chev .sf-svg { width: 12px; height: 12px; }
+  .row select:focus-visible { outline: 2px solid var(--fg); outline-offset: 1px; }
 
-  .keys { display: grid; gap: 6px; margin-top: 10px; padding: 10px; border-radius: 8px; background: var(--field); font-size: 12px; }
-  .keys div { display: flex; justify-content: space-between; align-items: center; }
-  .keys kbd { font: 500 11px/1 ui-monospace, "SF Mono", Menlo, monospace; color: var(--mute); }
-  button.link { flex: none; height: auto; padding: 0; border: 0; justify-self: start; color: var(--fg);
-                font-size: 12px; text-decoration: underline; text-underline-offset: 2px; }
-  p.help { margin: 12px 0 0; color: var(--mute); font-size: 12px; }
+  .keyfield { all: unset; box-sizing: border-box; position: relative; display: flex; align-items: center; justify-content: flex-end;
+              width: 132px; height: 30px; flex: none; padding: 0 4px 0 12px; border: 1px solid transparent; border-radius: 7px; background: transparent; cursor: pointer;
+              font-variant-numeric: tabular-nums; }
+  .keyfield kbd { display: inline-flex; font: 500 0.8125rem/1 "Inter Variable", -apple-system, sans-serif; letter-spacing: 0; }
+  @media (hover: hover) { .keyfield:not(.recording):hover { background: var(--bg); border-color: var(--control-border); } }
+  .keyfield:focus-visible { background: var(--bg); }
+  .keyfield.recording { background: var(--bg); padding-right: 12px; }
+  .keyfield.empty kbd { color: var(--mute); font-weight: 400; letter-spacing: 0; }
+  /* the pencil sits on the left so the keys never shift */
+  .keyfield .edit { position: absolute; left: 10px; top: 50%; translate: 0 -50%; display: inline-flex; color: var(--mute); opacity: 0; transition: opacity 120ms ease; }
+  .keyfield:focus-visible .edit { opacity: 1; }
+  @media (hover: hover) { .keyfield:hover .edit { opacity: 1; } }
+
+  /* press feedback on everything pressable */
+  .actions button, .keyfield { transition-property: scale, background-color, opacity, border-color; transition-duration: 150ms; transition-timing-function: ease-out; }
+  @media (prefers-reduced-motion: no-preference) {
+    .actions button:not(:disabled):active, .keyfield:active { scale: .96; }
+  }
+  .keyfield:focus-visible { outline: 2px solid var(--fg); outline-offset: 1px; }
+  .keyfield.recording { border-color: var(--accent); box-shadow: inset 0 0 0 .5px var(--accent); }
+  .keyfield.recording kbd { color: var(--accent); font-weight: 500; letter-spacing: 0; }
+  .keyfield.recording .edit { display: none; }
+  /* on/off switch, right edge on the same line as the boxes above it */
+  .switch { all: unset; position: relative; flex: none; width: 36px; height: 22px; margin-right: 4px; border-radius: 11px;
+            background: var(--control-border-hover); cursor: pointer; transition: background-color 150ms ease-out; }
+  .switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%;
+                   background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.25); }
+  .switch[aria-checked="true"] { background: var(--accent); }
+  .switch[aria-checked="true"]::after { translate: 14px 0; }
+  @media (prefers-reduced-motion: no-preference) { .switch::after { transition: translate 200ms cubic-bezier(.23, 1, .32, 1); } }
+  .switch:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+  .note { margin: 6px 2px 0; font-size: 0.75rem; color: var(--danger); }
+  .note:empty { display: none; }
 </style>
 </head>
 <body>
-  <!-- The toolbar popup (options.html?popup) adds the header and the screenshot buttons;
-       Chrome's options page shows only the settings. -->
-  <header class="popup-only">
-    <img src="icons/48.png" alt="">
+  <!-- One page for both: the toolbar popup (options.html?popup) and the settings tab. -->
+  <header>
     <h1>Atlas Saver</h1>
   </header>
 
-  <div class="shots popup-only">
-    <button id="shot" type="button" class="primary shot">Screenshot <kbd id="keys"></kbd></button>
-    <button id="full" type="button" class="shot">Full page <kbd id="fullKeys"></kbd></button>
-  </div>
-  <p class="err" id="shotErr" role="alert" hidden></p>
+  <section>
+    <h2>Shortcuts
+      <button class="info" type="button" data-icon="info.circle" aria-label="About shortcuts" aria-describedby="tipShortcuts"></button>
+      <span class="tooltip" role="tooltip" id="tipShortcuts"><span>Press a shortcut on any web page. Screenshot lets you pick: drag an area or click for the visible screen; hold ⌥ to pick a block (↑ ↓ for its parent or child), press F for the full page, Esc to cancel. Visible screen and Full page capture straight away.</span> <span id="tipSave"></span></span>
+    </h2>
+    <div class="rows">
+      <div class="row">
+        <span id="shotLabel">Screenshot</span>
+        <button class="keyfield" type="button" id="shotKey" data-name="Screenshot" aria-labelledby="shotLabel shotKey"><kbd></kbd><span class="edit" data-icon="pencil"></span></button>
+      </div>
+      <div class="row">
+        <span id="visibleLabel">Visible screen</span>
+        <button class="keyfield" type="button" id="visibleKey" data-name="Visible screen" aria-labelledby="visibleLabel visibleKey"><kbd></kbd><span class="edit" data-icon="pencil"></span></button>
+      </div>
+      <div class="row">
+        <span id="fullLabel">Full page</span>
+        <button class="keyfield" type="button" id="fullKey" data-name="Full page" aria-labelledby="fullLabel fullKey"><kbd></kbd><span class="edit" data-icon="pencil"></span></button>
+      </div>
+      <div class="row">
+        <span id="linkLabel">Save link</span>
+        <button class="keyfield" type="button" id="linkKey" data-name="Save link" aria-labelledby="linkLabel linkKey"><kbd></kbd><span class="edit" data-icon="pencil"></span></button>
+      </div>
+      <div class="row">
+        <label for="hoverKey">Show + button</label>
+        <select id="hoverKey">
+          <option value="Alt" aria-label="Option">⌥</option>
+          <option value="Control" aria-label="Control">⌃</option>
+          <option value="Shift" aria-label="Shift">⇧</option>
+          <option value="none">Always</option>
+        </select>
+      </div>
+      <div class="row">
+        <label for="noteKey">Note and tags</label>
+        <select id="noteKey">
+          <option value="Meta" aria-label="Command">⌘</option>
+          <option value="Alt" aria-label="Option">⌥</option>
+          <option value="Control" aria-label="Control">⌃</option>
+          <option value="Shift" aria-label="Shift">⇧</option>
+        </select>
+      </div>
+    </div>
+    <p class="note" id="keyNote" role="status"></p>
+  </section>
 
   <section>
-    <h2>Connection <span class="dot" id="status" role="status"><i></i><span>Checking</span></span></h2>
+    <h2>Settings
+      <button class="info" type="button" data-icon="info.circle" aria-label="About settings" aria-describedby="tipSettings"></button>
+      <span class="tooltip" role="tooltip" id="tipSettings">Guide on hold: holding ⌥ on a page shows a short guide with the screenshot actions and Save link; you can also hide it with its eye button. Sound on save: a quiet confirmation when a save lands.</span>
+    </h2>
+    <div class="rows">
+      <div class="row">
+        <span id="guideLabel">Guide on hold</span>
+        <button class="switch" type="button" role="switch" id="guide" aria-labelledby="guideLabel" aria-checked="true"></button>
+      </div>
+      <div class="row">
+        <span id="soundLabel">Sound on save</span>
+        <button class="switch" type="button" role="switch" id="sound" aria-labelledby="soundLabel" aria-checked="true"></button>
+      </div>
+    </div>
+  </section>
 
-    <label for="endpoint">Endpoint</label>
-    <input id="endpoint" class="mono" placeholder="Atlas ▸ Settings ▸ Developers" autocomplete="off" spellcheck="false">
+  <section class="connection">
+    <h2>Connection
+      <button class="info" type="button" data-icon="info.circle" aria-label="About the connection" aria-describedby="tipConnection"></button>
+      <span class="tooltip" role="tooltip" id="tipConnection">Find the endpoint and access key in Atlas ▸ Settings ▸ Developers. They're stored only in this browser, and Atlas must be running.</span>
+      <span class="dot" id="status" role="status"><i></i><span>Checking</span></span>
+    </h2>
 
-    <label for="token">Access key</label>
-    <input id="token" class="mono" type="password" placeholder="Access key from the same screen" autocomplete="off" spellcheck="false">
+    <label class="stack" for="endpoint">Endpoint</label>
+    <input id="endpoint" class="mono" placeholder="http://127.0.0.1:…/mcp" autocomplete="off" spellcheck="false">
 
-    <label for="collection">Save to collection</label>
-    <input id="collection" placeholder="Inbox" autocomplete="off" spellcheck="false">
+    <label class="stack" for="token">Access key</label>
+    <input id="token" class="mono" type="password" placeholder="Paste the access key" autocomplete="off" spellcheck="false">
 
-    <div class="row">
+    <div class="actions">
       <button id="test" type="button">Test connection</button>
       <button id="save" type="button" class="primary">Save</button>
     </div>
   </section>
 
-  <section>
-    <h2>Shortcuts</h2>
-
-    <div class="keys">
-      <div><span>Screenshot</span><kbd id="keysRow"></kbd></div>
-      <div><span>Full page</span><kbd id="fullKeysRow"></kbd></div>
-      <button id="editKeys" type="button" class="link">Change in Chrome</button>
-    </div>
-
-    <label for="hoverKey">Show the + button while holding</label>
-    <select id="hoverKey">
-      <option value="Alt">⌥ Option</option>
-      <option value="Control">⌃ Control</option>
-      <option value="Shift">⇧ Shift</option>
-      <option value="none">Nothing, always show it</option>
-    </select>
-
-    <label for="noteKey">Add a note and tags: also hold</label>
-    <select id="noteKey">
-      <option value="Meta">⌘ Command</option>
-      <option value="Alt">⌥ Option</option>
-      <option value="Control">⌃ Control</option>
-      <option value="Shift">⇧ Shift</option>
-    </select>
-
-    <p class="help" id="help"></p>
-  </section>
-
-  <script src="defaults.js"></script>
-  <script src="config.js" onerror="this.remove()"></script>
+  <script src="ui.js"></script>
   <script src="options.js"></script>
 </body>
 </html>

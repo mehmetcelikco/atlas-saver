@@ -7,10 +7,17 @@ Chrome extension that saves images, videos and screenshots from any web page int
 ## Features
 
 - **Save media** – hold ⌥ over the top-right corner of an image or video and press **+**. X, Instagram and LinkedIn posts keep their post link.
+- **Hold ⌥ anywhere** – a short guide slides in from the right with **Screenshot**, **Full page** and **Save link** (the page itself as a link card; hold ⌘ too to add a note and tags). ⇧⌘S saves the link straight away, or the image or video that has keyboard focus; the shortcut can be changed in settings. A quick ⌥+key while typing never shows it. Hide the guide with its eye button, or switch it off under **Settings ▸ Guide on hold**.
 - **Note and tags** – hold ⌘⌥ and press **+** to add a note and tags before saving. Both are written to the item in Atlas.
-- **Screenshots** – ⌥⇧S (or the popup): drag an area, click for the visible screen, hold ⌥ to pick a block on the page, or press **F** for the full page. ⌥⇧F takes a full-page shot straight away.
+- **Screenshots** – ⌥⇧W by default: drag an area (or ⇧-click two corners), click for the visible screen, hold ⌥ to pick a block on the page, or press **F** for the full page. ⌥⇧E captures the visible screen and ⌥⇧F a full-page shot, both straight away; while a long page is captured, a bar at the bottom shows progress with **Stop** (or Esc) to keep what's captured so far. All three shortcuts can be changed in the extension's settings: click the key field and press the new keys.
 - **Quality** – screenshots are always Retina 2×. On a non-Retina screen Chrome re-renders the area through its debugger, which briefly shows a bar at the top.
 - **WebM videos** are converted to MP4 in the browser, because macOS (and so Atlas) can't read them.
+
+- **Sound** – a short, quiet confirmation plays when a save lands (images, videos, links, screenshots) and nowhere else. Switch it off under **Settings ▸ Sound on save**.
+
+## Look
+
+The UI uses [Inter Variable](https://rsms.me/inter/) (bundled, SIL Open Font License, see `fonts/Inter-LICENSE.txt`). Icons are SF Symbols drawn from Apple's SF Pro font when it's installed; nothing from Apple is bundled, and similar SVG icons are used otherwise. Sounds come from [cuelume](https://github.com/danielwh2/cuelume) 0.2.8 (MIT, see `vendor/cuelume/LICENSE`), synthesized with Web Audio; no audio files and no network requests.
 
 ## Setup
 

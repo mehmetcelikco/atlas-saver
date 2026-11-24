@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Atlas Saver",
-  "version": "1.12.0",
+  "version": "1.27.0",
   "description": "Save any image or video on the web to Atlas with its source link, or snap a screenshot of any block on the page.",
   "permissions": [
     "storage",
@@ -47,6 +47,7 @@
         "https://*/*"
       ],
       "js": [
+        "ui.js",
         "content.js",
         "shot.js"
       ],
@@ -63,7 +64,7 @@
   },
   "options_ui": {
     "page": "options.html",
-    "open_in_tab": false
+    "open_in_tab": true
   },
   "icons": {
     "16": "icons/16.png",
@@ -71,20 +72,19 @@
     "48": "icons/48.png",
     "128": "icons/128.png"
   },
-  "commands": {
-    "take-screenshot": {
-      "suggested_key": {
-        "default": "Alt+Shift+S",
-        "mac": "Alt+Shift+S"
-      },
-      "description": "Take a screenshot to Atlas"
-    },
-    "take-full-page": {
-      "suggested_key": {
-        "default": "Alt+Shift+F",
-        "mac": "Alt+Shift+F"
-      },
-      "description": "Take a full-page screenshot to Atlas"
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "fonts/InterVariable.woff2",
+        "vendor/cuelume/*.js",
+        "vendor/cuelume/audio/*.js",
+        "vendor/cuelume/interactions/*.js",
+        "vendor/cuelume/sounds/*.js"
+      ],
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ]
     }
-  }
+  ]
 }

@@ -8,13 +8,13 @@ async function getConfig() {
   const stored = await chrome.storage.local.get(Object.keys(ATLAS_DEFAULTS));
   const cfg = { ...ATLAS_DEFAULTS };
   for (const k of Object.keys(cfg)) {
-    if (typeof stored[k] === "string" && (stored[k] !== "" || k === "collection")) cfg[k] = stored[k];
+    if (typeof stored[k] === "string" && stored[k] !== "") cfg[k] = stored[k];
   }
   return cfg;
 }
 
 async function rpc(cfg, method, params) {
-  if (!cfg.endpoint || !cfg.token) throw new Error("Add your Atlas endpoint and key in the popup");
+  if (!cfg.endpoint || !cfg.token) throw new Error("Add your Atlas endpoint and access key in Atlas Saver settings");
   let res;
   try {
     res = await fetch(cfg.endpoint, {
@@ -27,10 +27,10 @@ async function rpc(cfg, method, params) {
       body: JSON.stringify({ jsonrpc: "2.0", id: Date.now(), method, ...(params ? { params } : {}) })
     });
   } catch {
-    throw new Error("Atlas isn't running");
+    throw new Error("Atlas isn't running. Open Atlas and try again.");
   }
-  if (res.status === 401) throw new Error("Access key is out of date");
-  if (!res.ok) throw new Error(`Atlas answered ${res.status}`);
+  if (res.status === 401) throw new Error("Atlas didn't accept the access key. Paste the current key in Atlas Saver settings.");
+  if (!res.ok) throw new Error(`Atlas couldn't take the request (${res.status}). Try again, or restart Atlas.`);
 
   const text = await res.text();
   let msg;
@@ -169,6 +169,21 @@ async function libraryTags() {
   return names;
 }
 
+/* ---------- the page itself as a link card ---------- */
+
+async function saveLink({ url, note, tags }) {
+  const cfg = await getConfig();
+  const args = { url };
+  const since = new Date(Math.floor(Date.now() / 1000) * 1000).toISOString().replace(".000Z", "Z");
+  const { data, text } = await callTool(cfg, "add_link", args);
+  const extras = { note, tags };
+  const needExtras = !!((note || "").trim() || cleanTags(tags).length);
+  if (!needExtras) return { ok: true };
+  let ids = JSON.stringify(data ?? text ?? "").match(UUID) || [];
+  if (!ids.length) ids = await newestItems(cfg, since, 1).catch(() => []);
+  return { ok: true, ...(await applyExtras(cfg, [...new Set(ids)].slice(0, 1), extras)) };
+}
+
 /* ---------- videos macOS can't read ---------- */
 // Atlas imports through macOS, which can't open WebM (VP8/VP9/AV1). Those are played
 // in the offscreen page and re-recorded as H.264 MP4, then imported as a file.
@@ -217,7 +232,6 @@ async function save({ url, sourceUrl, note, tags }) {
 async function saveViaAtlas({ url, sourceUrl }, extras = {}) {
   const cfg = await getConfig();
   const args = { url };
-  if (cfg.collection) args.collection = cfg.collection;
 
   // Whole seconds, no fraction: the safest ISO 8601 form for Atlas to parse.
   const since = new Date(Math.floor(Date.now() / 1000) * 1000).toISOString().replace(".000Z", "Z");
@@ -441,7 +455,6 @@ async function importBlob(blob, name, sourceUrl, extras = {}) {
   const { path, cleanup } = await writeShot(blob, name);
   try {
     const args = { paths: [path] };
-    if (cfg.collection) args.collection = cfg.collection;
     const { data, text } = await callTool(cfg, "import_files", args);
     const ids = JSON.stringify(data?.items ?? "").match(UUID) || [];
     if (!ids.length) {
@@ -467,16 +480,24 @@ async function startShot(tab, full = false) {
     await chrome.tabs.sendMessage(tab.id, { type: "atlas-shot-start", full });
   } catch {
     // Tab was open before the extension loaded; add the scripts now.
-    await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ["content.js", "shot.js"] });
+    await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ["ui.js", "content.js", "shot.js"] });
     await chrome.tabs.sendMessage(tab.id, { type: "atlas-shot-start", full });
   }
 }
 
-chrome.commands.onCommand.addListener(async (command, tab) => {
+chrome.commands?.onCommand?.addListener(async (command, tab) => {
   if (command !== "take-screenshot" && command !== "take-full-page") return;
   if (!tab) [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   startShot(tab, command === "take-full-page").catch(() => {});
 });
+
+// The "Save to collection" setting is gone; drop any value saved by older versions.
+chrome.runtime.onInstalled.addListener(() => { chrome.storage.local.remove("collection").catch(() => {}); });
+
+// Saves always land in Atlas's Inbox; the page says "Added to Inbox".
+async function withWhere(res) {
+  return { ...res, where: "Inbox" };
+}
 
 const reply = (respond, job) => {
   Promise.resolve().then(job).then(
@@ -509,14 +530,22 @@ chrome.runtime.onMessage.addListener((msg, sender, respond) => {
   }
   if (msg?.type === "atlas-shot-frame") return reply(respond, () => shotFrame(msg, sender));
   if (msg?.type === "atlas-shot-cancel") { shot = null; return; }
-  if (msg?.type === "atlas-shot-finish") return reply(respond, () => enqueue(() => shotFinish(msg)));
+  if (msg?.type === "atlas-shot-finish") return reply(respond, () => enqueue(() => shotFinish(msg)).then(withWhere));
 
   if (msg?.type === "atlas-tags") {
     libraryTags().then((names) => respond({ ok: true, names }), () => respond({ ok: false, names: [] }));
     return true;
   }
+  if (msg?.type === "atlas-save-link") {
+    enqueue(() => saveLink(msg.payload)).then(withWhere).then(respond, (e) => respond({ ok: false, error: e.message || "Failed" }));
+    return true;
+  }
   if (msg?.type === "atlas-save") {
-    enqueue(() => save(msg.payload)).then(respond, (e) => respond({ ok: false, error: e.message || "Failed" }));
+    enqueue(() => save(msg.payload)).then(withWhere).then(respond, (e) => respond({ ok: false, error: e.message || "Failed" }));
+    return true;
+  }
+  if (msg?.type === "atlas-config") {
+    getConfig().then(({ endpoint, token }) => respond({ endpoint, token }), () => respond(null));
     return true;
   }
   if (msg?.type === "atlas-ping") {
