@@ -218,9 +218,9 @@ for (const id of ["hoverKey", "noteKey"]) {
   $(id).addEventListener("change", () => chrome.storage.local.set(syncKeys()));
 }
 
-/* ---------- sound on save ---------- */
+/* ---------- settings switches ---------- */
 
-// Switches: Guide on hold ("guide") and Sound on save ("sound"); both default to on.
+// Guide on hold ("guide"), on by default.
 function bindSwitch(id) {
   const sw = $(id);
   const draw = (on) => sw.setAttribute("aria-checked", String(on));
@@ -233,7 +233,6 @@ function bindSwitch(id) {
   // The guide can also be hidden from its own eye button on a page.
   chrome.storage.onChanged.addListener((c, area) => { if (area === "local" && c[id]) draw(c[id].newValue !== false); });
 }
-bindSwitch("sound");
 bindSwitch("guide");
 
 /* ---------- tooltips: Esc dismisses ---------- */

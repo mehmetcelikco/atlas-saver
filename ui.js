@@ -136,27 +136,6 @@ var AtlasUI = globalThis.AtlasUI || (() => {
 
   const FONT = '"Atlas Saver Inter", "Inter Variable", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
 
-  // A short confirmation sound (cuelume "success") played only when a save lands.
-  // The module is loaded on the first save gesture; "sound": false in settings turns it off.
-  let cue = null;
-  function prepareSound() {
-    try {
-      const modUrl = url("vendor/cuelume/index.js");
-      cue = cue || (modUrl ? import(modUrl).then((m) => { m.unlock(); return m; }, () => null) : Promise.resolve(null));
-    } catch {
-      cue = Promise.resolve(null);
-    }
-    return cue;
-  }
-  async function playSaved() {
-    try {
-      const { sound } = await getStored("sound");
-      if (sound === false) return;
-      const m = await prepareSound();
-      m?.play("success", { emphasis: "subtle" });
-    } catch { /* sound is optional */ }
-  }
-
   /* ---------- keycaps: each key in its own square, symbol centered ---------- */
   // Drawn on a 72×72 grid like the reference artwork (⌘ and ⌥ are its exact paths);
   // letters and digits are set in Inter so every key reads at the same weight.
@@ -229,5 +208,5 @@ var AtlasUI = globalThis.AtlasUI || (() => {
     .keycap svg { width: ${size}px; height: ${size}px; display: block; }
   `;
 
-  return { icon, iconCSS, hasSF, loadInter, FONT, prepareSound, playSaved, keycap, keycaps, keycapsFromGlyphs, keycapCSS, alive, send, getStored, setStored, onStored, RELOAD };
+  return { icon, iconCSS, hasSF, loadInter, FONT, keycap, keycaps, keycapsFromGlyphs, keycapCSS, alive, send, getStored, setStored, onStored, RELOAD };
 })();

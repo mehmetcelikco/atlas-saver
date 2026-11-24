@@ -492,7 +492,8 @@ chrome.commands?.onCommand?.addListener(async (command, tab) => {
 });
 
 // The "Save to collection" setting is gone; drop any value saved by older versions.
-chrome.runtime.onInstalled.addListener(() => { chrome.storage.local.remove("collection").catch(() => {}); });
+// Same for the removed "Sound on save" setting.
+chrome.runtime.onInstalled.addListener(() => { chrome.storage.local.remove(["collection", "sound"]).catch(() => {}); });
 
 // Saves always land in Atlas's Inbox; the page says "Added to Inbox".
 async function withWhere(res) {

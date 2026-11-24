@@ -588,7 +588,6 @@
       if (!extras) { if (fromKeys || !mediaAt(px, py)) hide(false); return; }
     }
 
-    AtlasUI.prepareSound(); // inside the click, so the browser lets audio start
     // Spinner on the button and a note beside it; videos can take a while (conversion).
     setState("saving", target instanceof HTMLVideoElement ? "Saving video…" : "Saving…");
     let viaPost = false, igFile = false;
@@ -611,7 +610,6 @@
     if (res?.ok) {
       saved.add(info.key);
       const to = res.where || "Inbox";
-      if (!res.duplicate) AtlasUI.playSaved();
       if (current === target || !current) setState("saved",
         res.duplicate ? (extras ? "Already in Atlas, note added" : "Already in Atlas")
         : extras && res.noted === false ? `Added to ${to}, note or tags not added`
@@ -843,7 +841,6 @@
       if (!extras) return;
     }
     linkBusy = true;
-    AtlasUI.prepareSound();
     showHud("Saving link…");
     let res;
     try {
@@ -853,7 +850,6 @@
     }
     linkBusy = false;
     const to = res?.where || "Inbox";
-    if (res?.ok) AtlasUI.playSaved();
     if (res?.ok) showHud(extras && res.noted === false ? `Link added to ${to}, note or tags not added` : extras ? `Link added to ${to} with note` : `Link added to ${to}`, "ok");
     else showHud(res?.error || "Couldn't save the link. Check that Atlas is running, then try again.", "error");
     // Leave the result up for a moment, then follow the key as usual.

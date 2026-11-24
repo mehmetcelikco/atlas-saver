@@ -584,12 +584,10 @@
   }
 
   async function finish(width, height, stopped = false) {
-    AtlasUI.prepareSound();
     toast("Saving screenshot…", "", true);
     const res = await send({ type: "atlas-shot-finish", width, height, sourceUrl: pageUrl(), title: document.title });
     busy = false;
     const to = res?.where || "Inbox";
-    if (res?.ok && !res.duplicate) AtlasUI.playSaved();
     if (res?.ok) toast(res.duplicate ? "Already in Atlas" : res.linked === false ? `Added to ${to}, link not attached` : res.clipped ? `Added to ${to} at a smaller size` : stopped ? `Screenshot added to ${to}, up to where you stopped` : `Screenshot added to ${to}`);
     else toast(res?.error || "No answer from the extension, reload the page", "error");
   }

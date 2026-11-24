@@ -13,11 +13,10 @@ Chrome extension that saves images, videos and screenshots from any web page int
 - **Quality** – screenshots are always Retina 2×. On a non-Retina screen Chrome re-renders the area through its debugger, which briefly shows a bar at the top.
 - **WebM videos** are converted to MP4 in the browser, because macOS (and so Atlas) can't read them.
 
-- **Sound** – a short, quiet confirmation plays when a save lands (images, videos, links, screenshots) and nowhere else. Switch it off under **Settings ▸ Sound on save**.
 
 ## Look
 
-The UI uses [Inter Variable](https://rsms.me/inter/) (bundled, SIL Open Font License, see `fonts/Inter-LICENSE.txt`). Icons are SF Symbols drawn from Apple's SF Pro font when it's installed; nothing from Apple is bundled, and similar SVG icons are used otherwise. Sounds come from [cuelume](https://github.com/danielwh2/cuelume) 0.2.8 (MIT, see `vendor/cuelume/LICENSE`), synthesized with Web Audio; no audio files and no network requests.
+The UI uses [Inter Variable](https://rsms.me/inter/) (bundled, SIL Open Font License, see `fonts/Inter-LICENSE.txt`). Icons are SF Symbols drawn from Apple's SF Pro font when it's installed; nothing from Apple is bundled, and similar SVG icons are used otherwise.
 
 ## Setup
 
