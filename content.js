@@ -88,14 +88,21 @@
   noteSheet.replaceSync(`
 
     .scrim { position: fixed; inset: 0; width: 100vw; height: 100vh; display: none; place-items: center;
-             background: rgba(0,0,0,.28); pointer-events: auto; }
-    .scrim.on { display: grid; animation: fade .14s ease; }
+             background: rgba(0,0,0,.28); pointer-events: auto; transition: opacity 140ms ease-out; }
+    .scrim.on { display: grid; }
+    @starting-style { .scrim.on { opacity: 0; } }
     .modal { width: min(380px, calc(100vw - 32px)); box-sizing: border-box; padding: 14px; border-radius: 22px; /* 8 inner + 14 padding */
              display: flex; flex-direction: column; gap: 10px; color: #f2f2f2; background: rgba(24,24,24,.94);
              -webkit-backdrop-filter: blur(20px) saturate(1.4); backdrop-filter: blur(20px) saturate(1.4);
              box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 18px 50px rgba(0,0,0,.35); border: 1px solid transparent;
              font: 13px/1.4 ${AtlasUI.FONT}; letter-spacing: -.005em;
-             animation: pop .18s cubic-bezier(.2,.8,.2,1); }
+             transition: opacity 180ms cubic-bezier(.2, .8, .2, 1), scale 180ms cubic-bezier(.2, .8, .2, 1); }
+    /* opens from 96% and transparent; reduced motion keeps only the fade */
+    @starting-style { .scrim.on .modal { opacity: 0; scale: .96; } }
+    @media (prefers-reduced-motion: reduce) {
+      .modal { transition: opacity 180ms ease-out; }
+      @starting-style { .scrim.on .modal { scale: 1; } }
+    }
     .head { display: flex; align-items: center; gap: 10px; }
     .linkthumb { display: grid; place-items: center; color: rgba(255,255,255,.8); font-size: 17px; }
     .linkthumb .sf-svg { width: 17px; height: 17px; }
@@ -108,7 +115,7 @@
     .modal textarea { min-height: 74px; resize: vertical; white-space: pre-wrap; }
     .modal textarea:focus-visible, .tagbox:focus-within { box-shadow: 0 0 0 1.5px rgba(255,255,255,.55); }
     .modal ::placeholder { color: rgba(255,255,255,.62); }
-    .tagbox { display: flex; flex-wrap: wrap; gap: 5px; padding: 6px; border-radius: 8px; background: rgba(255,255,255,.07); cursor: text; }
+    .tagbox { display: flex; flex-wrap: wrap; gap: 5px; padding: 6px; border-radius: 17px; /* 11 chip + 6 padding */ background: rgba(255,255,255,.07); cursor: text; }
     .tagbox input { flex: 1; min-width: 90px; width: auto; padding: 3px 4px; background: transparent; }
     .chip { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 4px 0 8px; border-radius: 11px;
             background: rgba(255,255,255,.14); font-size: 12px; }
@@ -119,22 +126,20 @@
     .sugg { display: flex; flex-wrap: wrap; gap: 5px; min-height: 0; }
     .sugg:empty { display: none; }
     .sugg span { height: 22px; padding: 0 8px; border-radius: 11px; display: inline-flex; align-items: center; cursor: pointer;
-                 font-size: 12px; color: rgba(255,255,255,.75); box-shadow: inset 0 0 0 1px rgba(255,255,255,.16); }
+                 font-size: 12px; color: rgba(255,255,255,.75); box-shadow: inset 0 0 0 1px rgba(255,255,255,.16); border: 1px solid transparent; box-sizing: border-box; }
     .sugg span.hi { background: rgba(255,255,255,.12); color: #fff; }
     @media (hover: hover) { .sugg span:hover { background: rgba(255,255,255,.12); color: #fff; } }
     .actions { display: flex; align-items: center; gap: 8px; margin-top: 2px; }
     .actions .hint { margin-right: auto; color: rgba(255,255,255,.62); font-size: 11px; }
     .modal button { all: unset; box-sizing: border-box; position: static; width: auto; height: 30px; padding: 0 12px;
                     border-radius: 8px; display: inline-flex; align-items: center; cursor: pointer; font-weight: 500;
-                    opacity: 1; scale: 1; pointer-events: auto; color: #f2f2f2; box-shadow: inset 0 0 0 1px rgba(255,255,255,.16); }
+                    opacity: 1; scale: 1; pointer-events: auto; color: #f2f2f2; box-shadow: inset 0 0 0 1px rgba(255,255,255,.16); border: 1px solid transparent; }
     .modal button.primary { background: #f2f2f2; color: #111; box-shadow: none; }
     .modal button { transition: scale 150ms ease-out; }
     .modal button:active { scale: .96; }
     @media (prefers-reduced-motion: reduce) { .modal button:active { scale: 1; } }
     .modal button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-    @keyframes fade { from { opacity: 0; } }
-    @keyframes pop { from { opacity: 0; scale: .96; } }
-    @media (prefers-reduced-motion: reduce) { .scrim.on, .modal { animation: none; } }
+
   `);
   const iconSheet = new CSSStyleSheet();
   iconSheet.replaceSync(AtlasUI.iconCSS(13) + `
@@ -158,7 +163,7 @@
     .hud .hide { all: unset; box-sizing: border-box; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 7px;
            color: rgba(255,255,255,.62); cursor: pointer; transition: background-color 150ms ease-out, color 150ms ease-out, scale 150ms ease-out; }
     @media (hover: hover) { .hud .hide:hover { background: rgba(255,255,255,.12); color: #fff; } }
-    .hud .hide:active { scale: .96; }
+    @media (prefers-reduced-motion: no-preference) { .hud .hide:active { scale: .96; } }
     .hud .hide:focus-visible { outline: 2px solid #fff; outline-offset: 1px; color: #fff; }
     .hud .hide .sf { font-size: 13px; }
     .hud .line { display: grid; grid-template-columns: 34px 1fr; gap: 8px; align-items: baseline; }
@@ -172,7 +177,7 @@
     .hud .act:active { scale: .96; }
     .hud .act:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
     .hud .act kbd { margin-left: auto; color: rgba(255,255,255,.62); font-weight: 500; letter-spacing: 0; }
-    .hud .act .sf { font-size: 13px; width: 16px; text-align: center; }
+    .hud .act .sf { font-size: 13px; width: 16px; text-align: center; font-weight: 500; }
     .hud .act .sf-svg { width: 14px; height: 14px; }
     .hud .hint { color: rgba(255,255,255,.62); font-size: 11px; }
     .hud .status { min-height: 0; color: rgba(255,255,255,.6); }

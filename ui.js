@@ -203,9 +203,10 @@ var AtlasUI = globalThis.AtlasUI || (() => {
     .keycaps { display: inline-flex; align-items: center; gap: ${Math.round(size * 0.14)}px; vertical-align: middle; }
     .keycap { box-sizing: border-box; display: inline-grid; place-items: center; width: ${size}px; height: ${size}px;
               border-radius: ${(size * 15.5 / 72).toFixed(1)}px; box-shadow: inset 0 0 0 1px var(--keycap-edge, rgba(17,17,17,.1));
+              border: 1px solid transparent; /* keeps an edge in forced-colors mode, which drops shadows */
               font: 500 ${Math.round(size * 0.58)}px/1 ${FONT}; letter-spacing: 0; color: inherit; }
     .keycap.wide { width: auto; padding: 0 ${Math.round(size * 0.27)}px; font-size: ${Math.round(size * 0.48)}px; }
-    .keycap svg { width: ${size}px; height: ${size}px; display: block; }
+    .keycap svg { width: ${size}px; height: ${size}px; margin: -1px; display: block; }
   `;
 
   return { icon, iconCSS, hasSF, loadInter, FONT, keycap, keycaps, keycapsFromGlyphs, keycapCSS, alive, send, getStored, setStored, onStored, RELOAD };

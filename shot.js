@@ -59,7 +59,7 @@
                       display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,.14); color: #fff; font-weight: 500;
                       transition: background-color 150ms ease-out, scale 150ms ease-out; }
     @media (hover: hover) { .progress .stop:hover { background: rgba(255,255,255,.24); } }
-    .progress .stop:active { scale: .96; }
+    @media (prefers-reduced-motion: no-preference) { .progress .stop:active { scale: .96; } }
     .progress .stop:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
     .progress .stop kbd { padding: 2px 4px; }
   `);
