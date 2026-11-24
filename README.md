@@ -12,6 +12,7 @@ Chrome extension that saves images, videos and screenshots from any web page int
 - **Screenshots** – ⌥⇧W by default: drag an area (or ⇧-click two corners), click for the visible screen, hold ⌥ to pick a block on the page, or press **F** for the full page. ⌥⇧E captures the visible screen and ⌥⇧F a full-page shot, both straight away; while a long page is captured, a bar at the bottom shows progress with **Stop** (or Esc) to keep what's captured so far. All three shortcuts can be changed in the extension's settings: click the key field and press the new keys.
 - **Quality** – screenshots are always Retina 2×. On a non-Retina screen Chrome re-renders the area through its debugger, which briefly shows a bar at the top.
 - **WebM videos** are converted to MP4 in the browser, because macOS (and so Atlas) can't read them.
+- **Stays out of design tools** – Figma, Framer, Canva, Miro, Excalidraw, tldraw, Penpot, Photopea, Spline, Rive and Whimsical use ⌥ for their own tools, so the extension doesn't run there. Published Framer sites (`*.framer.website`) still work.
 
 
 ## Look
