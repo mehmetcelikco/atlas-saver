@@ -494,8 +494,8 @@ chrome.runtime.onMessage.addListener((msg, sender, respond) => {
     });
   }
   if (msg?.type === "atlas-shot-config") {
-    chrome.storage.local.get("shotScale").then(({ shotScale }) => respond({ ok: true, scale: Number(shotScale) || 2 }));
-    return true;
+    respond({ ok: true, scale: 2 }); // always Retina 2×
+    return;
   }
   if (msg?.type === "atlas-shot-render") return reply(respond, () => shotRender(msg, sender));
   if (msg?.type === "atlas-helper-ping") {

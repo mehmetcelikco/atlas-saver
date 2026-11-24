@@ -9,7 +9,7 @@ Chrome extension that saves images, videos and screenshots from any web page int
 - **Save media** – hold ⌥ over the top-right corner of an image or video and press **+**. X, Instagram and LinkedIn posts keep their post link.
 - **Note and tags** – hold ⌘⌥ and press **+** to add a note and tags before saving. Both are written to the item in Atlas.
 - **Screenshots** – ⌥⇧S (or the popup): drag an area, click for the visible screen, hold ⌥ to pick a block on the page, or press **F** for the full page. ⌥⇧F takes a full-page shot straight away.
-- **Quality** – Retina 2× or 4× (4× re-renders the area through Chrome's debugger, which briefly shows a bar at the top).
+- **Quality** – screenshots are always Retina 2×. On a non-Retina screen Chrome re-renders the area through its debugger, which briefly shows a bar at the top.
 - **WebM videos** are converted to MP4 in the browser, because macOS (and so Atlas) can't read them.
 
 ## Setup

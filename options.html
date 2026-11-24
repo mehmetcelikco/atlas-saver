@@ -7,94 +7,108 @@
   :root { color-scheme: light dark; --bg:#fff; --fg:#111; --mute:#8a8a8a; --line:#e8e8e8; --field:#f6f6f6; }
   @media (prefers-color-scheme: dark) { :root { --bg:#161616; --fg:#f2f2f2; --mute:#8a8a8a; --line:#2a2a2a; --field:#202020; } }
   * { box-sizing: border-box; }
-  body { margin: 0; width: 320px; padding: 18px; background: var(--bg); color: var(--fg);
+  body { margin: 0; padding: 4px 2px 12px; background: var(--bg); color: var(--fg);
          font: 13px/1.4 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif; }
-  header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
-  header img { width: 24px; height: 24px; border-radius: 6px; }
+  body.popup { width: 320px; padding: 18px; }
+  .popup-only { display: none; }
+  body.popup .popup-only { display: block; }
+  body.popup header.popup-only, body.popup .shots.popup-only { display: flex; }
+
+  header { align-items: center; gap: 10px; margin-bottom: 16px; }
+  header img { width: 24px; height: 24px; }
   h1 { font-size: 14px; font-weight: 600; margin: 0; letter-spacing: -.01em; }
-  .dot { margin-left: auto; display: flex; align-items: center; gap: 6px; color: var(--mute); font-size: 12px; }
+  h2 { display: flex; align-items: center; margin: 22px 0 2px; font-size: 13px; font-weight: 600; letter-spacing: -.005em; }
+  section:first-of-type h2 { margin-top: 4px; }
+  body.popup section:first-of-type h2 { margin-top: 18px; }
+  .dot { margin-left: auto; display: flex; align-items: center; gap: 6px; color: var(--mute); font-size: 12px; font-weight: 400; }
   .dot i { width: 7px; height: 7px; border-radius: 50%; background: #c4c4c4; }
   .dot.ok i { background: #2fb36a; } .dot.bad i { background: #d63434; }
+
   label { display: block; margin: 12px 0 5px; font-size: 12px; color: var(--mute); }
   input, select { width: 100%; height: 32px; padding: 0 10px; border: 1px solid transparent; border-radius: 8px;
           background: var(--field); color: var(--fg); font: inherit; outline: none; }
   select { appearance: none; cursor: pointer; }
   input:focus-visible, select:focus-visible { border-color: var(--fg); }
   input.mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; }
-  .row { display: flex; gap: 8px; margin-top: 16px; }
+
+  .row { display: flex; gap: 8px; margin-top: 14px; }
   button { flex: 1; height: 32px; border-radius: 8px; border: 1px solid var(--line); background: transparent;
            color: var(--fg); font: inherit; font-weight: 500; cursor: pointer; }
   button.primary { background: var(--fg); color: var(--bg); border-color: var(--fg); }
   button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
-  .shots { display: flex; gap: 8px; }
-  button.shot { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 4px; }
+
+  .shots { gap: 8px; }
+  button.shot { display: flex; align-items: center; justify-content: center; gap: 8px; }
   button.shot kbd { font: 500 11px/1 ui-monospace, "SF Mono", Menlo, monospace; opacity: .6; }
-  .keys { display: grid; gap: 6px; padding: 10px; border-radius: 8px; background: var(--field); font-size: 12px; }
+  p.err { color: #d63434; margin: 8px 0 0; font-size: 12px; }
+
+  .keys { display: grid; gap: 6px; margin-top: 10px; padding: 10px; border-radius: 8px; background: var(--field); font-size: 12px; }
   .keys div { display: flex; justify-content: space-between; align-items: center; }
   .keys kbd { font: 500 11px/1 ui-monospace, "SF Mono", Menlo, monospace; color: var(--mute); }
   button.link { flex: none; height: auto; padding: 0; border: 0; justify-self: start; color: var(--fg);
                 font-size: 12px; text-decoration: underline; text-underline-offset: 2px; }
-  p.err { color: #d63434; min-height: 0; margin: 6px 0 0; }
-  p { margin: 14px 0 0; color: var(--mute); font-size: 12px; }
+  p.help { margin: 12px 0 0; color: var(--mute); font-size: 12px; }
 </style>
 </head>
 <body>
-  <header>
+  <!-- The toolbar popup (options.html?popup) adds the header and the screenshot buttons;
+       Chrome's options page shows only the settings. -->
+  <header class="popup-only">
     <img src="icons/48.png" alt="">
     <h1>Atlas Saver</h1>
-    <span class="dot" id="status" role="status"><i></i><span>Checking</span></span>
   </header>
 
-  <div class="shots">
-    <button id="shot" type="button" class="primary shot">Screenshot <kbd id="keys">⌥⇧S</kbd></button>
-    <button id="full" type="button" class="shot">Full page <kbd id="fullKeys">⌥⇧F</kbd></button>
+  <div class="shots popup-only">
+    <button id="shot" type="button" class="primary shot">Screenshot <kbd id="keys"></kbd></button>
+    <button id="full" type="button" class="shot">Full page <kbd id="fullKeys"></kbd></button>
   </div>
-
   <p class="err" id="shotErr" role="alert" hidden></p>
 
-  <label for="shotScale">Screenshot quality</label>
-  <select id="shotScale">
-    <option value="2">Retina 2×</option>
-    <option value="4">Retina 4×</option>
-  </select>
+  <section>
+    <h2>Connection <span class="dot" id="status" role="status"><i></i><span>Checking</span></span></h2>
 
-  <label>Shortcuts</label>
-  <div class="keys">
-    <div><span>Screenshot</span><kbd id="keysRow">⌥⇧S</kbd></div>
-    <div><span>Full page</span><kbd id="fullKeysRow">⌥⇧F</kbd></div>
-    <button id="editKeys" type="button" class="link">Change in Chrome</button>
-  </div>
+    <label for="endpoint">Endpoint</label>
+    <input id="endpoint" class="mono" placeholder="Atlas ▸ Settings ▸ Developers" autocomplete="off" spellcheck="false">
 
-  <label for="hoverKey">Show the + button while holding</label>
-  <select id="hoverKey">
-    <option value="Alt">⌥ Option</option>
-    <option value="Control">⌃ Control</option>
-    <option value="Shift">⇧ Shift</option>
-    <option value="none">Nothing, always show it</option>
-  </select>
+    <label for="token">Access key</label>
+    <input id="token" class="mono" type="password" placeholder="Access key from the same screen" autocomplete="off" spellcheck="false">
 
-  <label for="noteKey">Add a note and tags: also hold</label>
-  <select id="noteKey">
-    <option value="Meta">⌘ Command</option>
-    <option value="Alt">⌥ Option</option>
-    <option value="Control">⌃ Control</option>
-    <option value="Shift">⇧ Shift</option>
-  </select>
+    <label for="collection">Save to collection</label>
+    <input id="collection" placeholder="Inbox" autocomplete="off" spellcheck="false">
 
-  <label for="collection">Save to collection</label>
-  <input id="collection" placeholder="Inbox" autocomplete="off" spellcheck="false">
+    <div class="row">
+      <button id="test" type="button">Test connection</button>
+      <button id="save" type="button" class="primary">Save</button>
+    </div>
+  </section>
 
-  <label for="endpoint">Endpoint</label>
-  <input id="endpoint" class="mono" placeholder="Atlas ▸ Settings ▸ Developers" autocomplete="off" spellcheck="false">
+  <section>
+    <h2>Shortcuts</h2>
 
-  <label for="token">Access key</label>
-  <input id="token" class="mono" type="password" placeholder="Access key from the same screen" autocomplete="off" spellcheck="false">
+    <div class="keys">
+      <div><span>Screenshot</span><kbd id="keysRow"></kbd></div>
+      <div><span>Full page</span><kbd id="fullKeysRow"></kbd></div>
+      <button id="editKeys" type="button" class="link">Change in Chrome</button>
+    </div>
 
-  <div class="row">
-    <button id="test" type="button">Test connection</button>
-    <button id="save" type="button" class="primary">Save</button>
-  </div>
-  <p id="help"></p>
+    <label for="hoverKey">Show the + button while holding</label>
+    <select id="hoverKey">
+      <option value="Alt">⌥ Option</option>
+      <option value="Control">⌃ Control</option>
+      <option value="Shift">⇧ Shift</option>
+      <option value="none">Nothing, always show it</option>
+    </select>
+
+    <label for="noteKey">Add a note and tags: also hold</label>
+    <select id="noteKey">
+      <option value="Meta">⌘ Command</option>
+      <option value="Alt">⌥ Option</option>
+      <option value="Control">⌃ Control</option>
+      <option value="Shift">⇧ Shift</option>
+    </select>
+
+    <p class="help" id="help"></p>
+  </section>
 
   <script src="defaults.js"></script>
   <script src="config.js" onerror="this.remove()"></script>

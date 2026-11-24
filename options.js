@@ -1,5 +1,7 @@
 const fields = ["collection", "endpoint", "token"];
 const $ = (id) => document.getElementById(id);
+// The toolbar popup opens options.html?popup; Chrome's options page opens it plain.
+document.body.classList.toggle("popup", new URLSearchParams(location.search).has("popup"));
 const status = $("status");
 
 function read() {
@@ -48,7 +50,7 @@ $("full").addEventListener("click", () => startShot(true));
 chrome.commands?.getAll?.().then((cmds) => {
   for (const [name, ids] of [["take-screenshot", ["keys", "keysRow"]], ["take-full-page", ["fullKeys", "fullKeysRow"]]]) {
     const key = cmds.find((c) => c.name === name)?.shortcut;
-    for (const id of ids) key ? ($(id).textContent = key) : ($(id).textContent = id.endsWith("Row") ? "Not set" : "");
+    for (const id of ids) $(id).textContent = key || (id.endsWith("Row") ? "Not set" : "");
   }
 });
 
@@ -87,5 +89,3 @@ for (const id of ["hoverKey", "noteKey"]) {
   $(id).addEventListener("change", () => chrome.storage.local.set(syncKeys()));
 }
 
-chrome.storage.local.get("shotScale").then(({ shotScale }) => { $("shotScale").value = String(shotScale || 2); });
-$("shotScale").addEventListener("change", (e) => chrome.storage.local.set({ shotScale: Number(e.target.value) }));
