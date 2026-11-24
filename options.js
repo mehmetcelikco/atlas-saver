@@ -59,6 +59,7 @@ function read() {
 function setStatus(kind, text) {
   status.className = `dot ${kind}`;
   status.lastElementChild.textContent = text;
+  status.title = kind === "ok" ? text : "";
 }
 
 async function test() {

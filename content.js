@@ -223,6 +223,8 @@
   const tip = document.createElement("div");
   tip.className = "tip";
   root.append(btn, tip);
+  // The + button and its note always sit above the guide, so a click meant for + never lands on a guide row.
+  btn.style.zIndex = tip.style.zIndex = "2";
 
   /* ---------- finding the media under the pointer ---------- */
 
@@ -493,7 +495,6 @@
   function show(el) {
     AtlasUI.loadInter();
     clearTimeout(hideTimer);
-    if (hudOn && !hudHover && !linkBusy) hideHud(true); // the guide steps aside for the + button
     if (el !== current) {
       current = el;
       if (state !== "saving") setState(saved.has(describe(el).key) ? "saved" : "idle");
@@ -501,7 +502,14 @@
     if (!host.isConnected) document.documentElement.appendChild(host);
     place();
     btn.classList.add("on");
+    // The guide steps aside for the + button, even while the pointer is over it when they overlap.
+    if (hudOn && !linkBusy && (!hudHover || overlaps(btn, hud))) hideHud(true);
   }
+
+  const overlaps = (a, b) => {
+    const r = a.getBoundingClientRect(), q = b.getBoundingClientRect();
+    return r.left < q.right && r.right > q.left && r.top < q.bottom && r.bottom > q.top;
+  };
 
   function hide(now) {
     clearTimeout(hideTimer);

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Atlas Saver",
-  "version": "1.28.1",
+  "version": "1.28.2",
   "description": "Save any image or video on the web to Atlas with its source link, or snap a screenshot of any block on the page.",
   "permissions": [
     "storage",

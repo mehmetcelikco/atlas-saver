@@ -76,6 +76,8 @@
   .dot { margin-left: auto; display: flex; align-items: center; gap: 6px; color: var(--mute); font-size: 0.75rem; font-weight: 400; }
   .dot i { width: 7px; height: 7px; border-radius: 50%; background: #c4c4c4; }
   .dot.ok i { background: #2fb36a; } .dot.bad i { background: var(--danger); }
+  /* connected: the green dot alone; the word stays for screen readers and the hover title */
+  .dot.ok span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
   label.stack { display: block; margin: 12px 0 5px; padding: 0 12px; font-size: 0.75rem; color: var(--mute); }
   section h2 + label.stack { margin-top: 0; }
